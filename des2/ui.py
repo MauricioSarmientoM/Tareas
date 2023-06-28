@@ -6,5 +6,7 @@ class UI():
         self.window = Tk()
         self.window.title(hospital.name)
         self.window.geometry('600x400')
+    def AdminMedics(self):
+        pass
     def Render(self):
         self.window.mainloop()

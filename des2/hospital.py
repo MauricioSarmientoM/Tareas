@@ -35,8 +35,18 @@ class Unit(Enum):
 class Derivation(Enum):
     Consult = 0
     Emergency = 1
+class RUT():
+    def __init__(self, rut : int) -> None:
+        self.rut = rut
+        data = [2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7]
+        self.__digit = 11 - (sum([int(i) * j for i, j in zip(str(rut)[::-1], data)]) - int(sum([int(i) * j for i, j in zip(str(rut)[::-1], data)]) / 11) * 11)
+    @property
+    def digit(self):
+        return f'{self.__digit}' if self.__digit < 10 else 'K' if self.__digit != 10 else '0'
+    def __str__(self):
+        return f'{self.rut}-{self.digit}'
 class Person():
-    def __init__(self, name : str = '', rut : str = '', admission : date = date(year = 2023, month = 7, day = 3), prevision : Prevision = Prevision.FONASA, afp : AFP = AFP.Uno) -> None:
+    def __init__(self, rut : RUT, name : str = '', admission : date = date(year = 2023, month = 7, day = 3), prevision : Prevision = Prevision.FONASA, afp : AFP = AFP.Uno) -> None:
         self.name = name
         self.rut = rut
         self.admission = admission
@@ -97,3 +107,6 @@ class Hospital():
     def Money(self, boxNumber : int = 0):
         if self.box[boxNumber] != None:
             pass
+def Main():
+    print(RUT(20751584))
+if __name__ == '__main__': Main()
