@@ -5,8 +5,12 @@ class UI():
     def __init__(self, hospital : Hospital, db : DB) -> None:
         self.window = Tk()
         self.window.title(hospital.name)
-        self.window.geometry('600x400')
+        self.window.geometry('800x600')
     def AdminMedics(self):
+        pass
+    def AdminAdmin(self):
+        pass
+    def AdminPatient(self):
         pass
     def Render(self):
         self.window.mainloop()

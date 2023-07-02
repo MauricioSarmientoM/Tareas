@@ -35,29 +35,28 @@ class DB():
         except Exception as e:
             print(e)
         return self
-    def DropTable(self, table : str = ''):
+    def DropTable(self, table):
         try:
             self.cursor.execute(f'DROP TABLE {table}')
             self.connection.commit()
         except Exception as e:
             print(e)
         return self
-    def InsertTable(self, table : str = '', column : str = '', values : list = []):
+    def InsertTable(self, table : str, column : str, values : list):
         try:
             if column != '': column = f' ({",".join(column.split(" "))})'
             values = [f'{i}' if not isinstance(i, str) else f'"{i}"' for i in values]
             data = f'({",".join(values)})'
-            #print(f'INSERT INTO {table}{column} VALUES {data}')
             self.cursor.execute(f'INSERT INTO {table}{column} VALUES {data}')
             self.connection.commit()
         except Exception as e:
             print(e)
         return self
-    def Select(self, column : str = '', table : str = '', fetch : int = 1, where : str = ''):
+    def Select(self, table : str, column : str = '', fetch : int = 1, where : str = ''):
         try:
             if column == '': column = '*'
             else: column = f'({",".join(column.split(" "))})'
-            if where != '': where = f' WHERE ({",".join(where.split(","))})'
+            if where != '': where = f' WHERE {",".join(where.split(","))}'
             self.cursor.execute(f'SELECT {column} FROM {table}{where}')
             if fetch < 1:
                 return self.cursor.fetchall()
@@ -68,20 +67,20 @@ class DB():
         except Exception as e:
             print(e)
         return self
-    def Update(self, table : str, column : str, values : str, where : str = ''):
+    def Update(self, table : str, column : str, values : list, where : str):
         try:
-            if column != '': column = f' ({",".join(column.split(" "))})'
-            values = [f'{i}' if not isinstance(i, str) else f'"{i}"' for i in values]
-            data = f'({",".join(values)})'
-            if where != '': where = f' WHERE ({",".join(where.split(","))})'
-            self.cursor.execute(f'UPDATE {table} SET {values}{where}')
+            if column != '': 
+                data = [f'{j} = {k}' for j, k in zip(column.split(" "), [f'{i}' if not isinstance(i, str) else f'"{i}"' for i in values])]
+                data = f'{",".join(data)}'
+            if where != '': where = f' WHERE {",".join(where.split(","))}'
+            self.cursor.execute(f'UPDATE {table} SET {data}{where}')
             self.connection.commit()
         except Exception as e:
             print(e)
         return self
     def DeleteTable(self, table : str, where : str = ''):
         try:
-            if where != '': where = f' WHERE ({",".join(where.split(","))})'
+            if where != '': where = f' WHERE {",".join(where.split(","))}'
             self.cursor.execute(f'DELETE FROM {table}{where}')
             self.connection.commit()
         except Exception as e:
@@ -94,5 +93,5 @@ def Main():
     #db.CreateTable('patient', 'id INT PRIMARY KEY AUTO_INCREMENT, reason VARCHAR(128), derivation INT, medic INT FOREIGN KEY')
     #db.InsertTable(table = 'person', column = 'rut name admission afp occupation', values = [16184388, 'Yoselin Marambio', '2017-03-12', 'Uno', 2])
     #db.DeleteTable(table = 'person', where = '')
-    #print(db.Select(table = 'person', fetch = -1))
+    #print(db.Update(table = 'person', column = 'name afp', values = ['Celeste Marambio', 'Uno'], where = 'rut = 20751584').Select(table = 'person', fetch = -1))
 if __name__ == '__main__': Main()
