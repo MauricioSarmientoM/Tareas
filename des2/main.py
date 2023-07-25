@@ -1,7 +1,7 @@
-from ui import UI, Hospital, DB
+from ui import UI
+from hospital import Hospital
+from db import DB
 def Main():
-    db = DB(database = 'dev2')
-    hospital = Hospital()
-    ui = UI(hospital, db)
-    ui.Render()
+    ui = UI(Hospital(), DB(database = 'dev2'))
+    ui.Base().mainloop()
 if __name__ == '__main__': Main()
