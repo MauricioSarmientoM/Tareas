@@ -31,9 +31,9 @@ class DB():
                 self.cursor = self.connection.cursor()
                 #Hack to autocomplete the necessary stuff
                 self.cursor.execute('CREATE TABLE workers (rut INT, name VARCHAR(64) NOT NULL, admission DATE NOT NULL, prevision INT, afp INT, salary INT, specialty INT, area INT, unit INT, occupation INT, PRIMARY KEY (rut))')
-                self.cursor.execute('CREATE TABLE patients (id INT, fkRUT INT, name VARCHAR(64) NOT NULL, admission DATE NOT NULL, prevision INT, afp INT, fkRUT INT, reason VARCHAR(128), derivation INT, medic INT, box INT, wait INT, PRIMARY KEY (rut), FOREIGN KEY (fkRUT) REFERENCES person(rut)')
-                self.cursor.execute('CREATE TABLE remunerations (id INT, fkRUT INT, brute INT, afp INT, plus INT, liquid INT, PRIMARY KEY (id), FOREIGN KEY (fkPerson) REFERENCES person(rut))')
-                self.cursor.execute('CREATE TABLE charges (id INT, fkRUT INT, brute INT, discount INT, extra INT, total INT, PRIMARY KEY (id), FOREIGN KEY (fkPerson) REFERENCES person(rut))')
+                self.cursor.execute('CREATE TABLE patients (id INT AUTOINCREMENT, rut INT, name VARCHAR(64) NOT NULL, admission DATE NOT NULL, prevision INT, afp INT, fkRUT INT, reason VARCHAR(128), derivation INT, medic INT, box INT, wait INT, PRIMARY KEY (id), FOREIGN KEY (fkRUT) REFERENCES workers(rut)')
+                self.cursor.execute('CREATE TABLE remunerations (id INT, fkRUT INT, brute INT, afp INT, prevision INT, plus INT, liquid INT, PRIMARY KEY (id), FOREIGN KEY (fkRUT) REFERENCES workers(rut))')
+                self.cursor.execute('CREATE TABLE charges (id INT, fkRUT INT, brute INT, discount INT, extra INT, total INT, PRIMARY KEY (id), FOREIGN KEY (fkRUT) REFERENCES patients(rut))')
                 self.connection.commit()
                 print('Connected Succesfully!')
                 #db.CreateTable('person', 'rut INT UNIQUE PRIMARY KEY, name VARCHAR(32), admission DATE, afp VARCHAR(16), occupation INT FOREIGN KEY, patient INT FOREIGN KEY')
