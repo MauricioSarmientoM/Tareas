@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+        <meta charset="utf-8"/>
+        <meta name="author" content="Self Spectrum"/>
+        <meta name="description" content="Chromatic Aberration main page. Get to know the last new about our games and updates, Talk with the comumnity and share moments!"/>
+        <link rel="icon" href="./src/chromaber.png" type="image/png" />
+        <title>Chromatic Aberration</title>
+	</head>
+	<body style = "background-color: #303030; color: #f0f0f0; font-family: Arial; font-size: 20px;">
+        <nav>
+            <div style = "position: fixed; display: block; top: 10px; left: 2.5%; z-index: 10; width: 95%; height: 46px; background-color: rgba(10, 10, 10, 0.7); border-radius: 10px; backdrop-filter: blur(6px); box-shadow: 8px 8px 4px rgba(0, 0, 0, .75)">
+                <table style = "table-layout: fixed">
+                    <tr>
+                        <td style = "width: 100%;">
+                            <a href="index.html"><img src = "./src/chromaber.png" alt = "Chromatic Aberration Logo" width = "40" height = "40" style = "border-radius: 50%;"/></a>
+                        </td>
+                        <td>
+                            <a href="login.html"><button type = "button" style = "width: 100px; background-color: #101010; color: #f0f0f0; border-style: none; border-radius: 10px 0px 0px 10px; font-family: Arial; font-size: 20px; cursor: pointer; box-shadow: -2px 0px 4px rgba(255, 0, 0, .75)">Login</button></a>
+                        </td>
+                        <td>
+                            <a href="signin.html"><button type = "button" style = "width: 100px; background-color: #101010; color: #f0f0f0; border-style: none; border-radius: 0px 10px 10px 0px; font-family: Arial; font-size: 20px; cursor: pointer; box-shadow: 2px 0px 4px rgba(0, 255, 255, .75)">Sign In</button></a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </nav>
+		<div style = "position: absolute; display: block; top: 70px; left: 2.5%; width: 95%; height: 400px; background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 1)), url('./src/birthright.png'); background-size: 100%; background-position: 25%; border-radius: 25px 0px 25px 0px; box-shadow: 16px 16px 4px rgba(0, 0, 0, .75)">
+			<table style = "width: 100%; height: 100%;">
+				<tr style = "height: 50%;">
+					<td style = "text-align: center;">
+						<a style = "text-decoration: none;" href = "index.html"><strong style = "font-family: Arial; font-size: 70px; color: #f0f0f0; text-shadow: 4px 4px 4px rgba(0, 0, 0, .75)">Chromatic Aberration</strong></a>
+					</td>
+				</tr>
+				<tr style = "height: 50%;">
+					<td style = "text-align: center;">
+						<i style = "font-family: Arial; font-size: 20px; color: #f0f0f0;">Compromise in making quality games</i>
+					</td>
+				</tr>
+			</table>
+		</div>
+        <div style = "position: absolute; display: block; top: 550px; left: 20%; width: 60%; height: 1000px; background-color: rgba(10, 10, 10, 0.7); border-radius: 0px 25px 0px 25px;  box-shadow: 16px 16px 4px rgba(0, 0, 0, .75)">
+            <form action = "" method = "post">
+                <table style = "position: absolute; width: 95%; height: 90%; left: 2.5%; padding-top: 5%">
+                    <tr>
+                        <td style = "width: 33%; text-align: center;">
+                            <label for = "nameinput">Name</label>
+                        </td>
+                        <td>
+                            <input id = "nameinput" type = "text" name = "name" style = "width: 80%;"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style = "width: 33%; text-align: center;">
+                            <label for = "surnameinput" style = "color: #f0f0f0; font-family: Arial; font-size: 20px;">Surname</label>
+                        </td>
+                        <td>
+                            <input id = "surnameinput" type = "text" name = "surname" style = "width: 80%;"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style = "width: 33%; text-align: center;">
+                            <label for = "userinput" style = "color: #f0f0f0; font-family: Arial; font-size: 20px;">User Name</label>
+                        </td>
+                        <td>
+                            <input id = "userinput" type = "text" name = "username" style = "width: 80%;"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style = "width: 33%; text-align: center;">
+                            <label for = "passwordinput" style = "color: #f0f0f0; font-family: Arial; font-size: 20px;">Password</label>
+                        </td>
+                        <td>
+                            <input id = "passwordinput" type = "password" name = "password" style = "width: 80%;"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style = "width: 33%; text-align: center;">
+                            <label for = "emailinput" style = "color: #f0f0f0; font-family: Arial; font-size: 20px;">Email</label>
+                        </td>
+                        <td>
+                            <input id = "emailinput" type = "email" name = "email" style = "width: 80%;"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style = "width: 33%; text-align: center;">
+                            <label for = "dateinput" style = "color: #f0f0f0; font-family: Arial; font-size: 20px;">Birth Date</label>
+                        </td>
+                        <td>
+                            <input id = "dateinput" type = "date" name = "birthday" style = "width: 80%;"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style = "width: 33%; text-align: center;">
+                            <label for = "ageinput" style = "color: #f0f0f0; font-family: Arial; font-size: 20px;">Age</label>
+                        </td>
+                        <td>
+                            <input id = "ageinput" type = "number" name = "age" style = "width: 80%;"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style = "width: 33%; text-align: center;">
+                            <label style = "color: #f0f0f0; font-family: Arial; font-size: 20px;">Sex</label>
+                        </td>
+                        <td>
+                            <fieldset style = "width: 75%;  text-align: center;">
+                                <legend>Choose your prefered sex</legend>
+                                <table style = "width: 100%;">
+                                    <tr>
+                                        <td>
+                                            <input type = "radio" id = "womancheck" name = "sex">
+                                        </td>
+                                        <td>
+                                            <label for = "womancheck">Woman</label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input type = "radio" id = "mancheck" name = "sex">
+                                        </td>
+                                        <td>
+                                            <label for = "mancheck">Man</label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input type = "radio" id = "normalcheck" name = "sex">
+                                        </td>
+                                        <td>
+                                            <label for = "normalcheck">Normal</label>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </fieldset>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style = "width: 33%; text-align: center;">
+                            <label>Interests</label>
+                        </td>
+                        <td>
+                            <fieldset style = "width: 75%;  text-align: center;">
+                                <legend>Choose your interests</legend>
+                                <table style = "width: 100%;">
+                                    <tr>
+                                        <td>
+                                            <input type = "checkbox" id = "roboticcheck" name = "interests">
+                                        </td>
+                                        <td>
+                                            <label for = "roboticcheck">Robotic</label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input type = "checkbox" id = "aicheck" name = "interests">
+                                        </td>
+                                        <td>
+                                            <label for = "aicheck">AI</label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input type = "checkbox" id = "developmentcheck" name = "interests">
+                                        </td>
+                                        <td>
+                                            <label for = "developmentcheck">Development</label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input type = "checkbox" id = "dataanalysischeck" name = "interests">
+                                        </td>
+                                        <td>
+                                            <label for = "dataanalysischeck">Data Analysis</label>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </fieldset>
+                        </td>
+                    </tr>
+                </table>
+                <input type = "reset" style = "position: absolute; left: 15%; bottom: 40px; width: 30%; height: 40px; background-color: #101010; color: #f0f0f0; border-style: none; border-radius: 10px; font-family: Arial; font-size: 20px; cursor: pointer; box-shadow: 8px 8px 4px rgba(0, 0, 0, .75)" value = "Reset"/>
+                <input type = "submit" style = "position: absolute; left: 55%; bottom: 40px; width: 30%; height: 40px; background-color: #101010; color: #f0f0f0; border-style: none; border-radius: 10px; font-family: Arial; font-size: 20px; cursor: pointer; box-shadow: 8px 8px 4px rgba(0, 0, 0, .75)" value = "Sign In"/>
+            </form>
+        </div>
+<!-- ====================================FOOTER==================================== -->
+        <footer>
+            <div style = "position: absolute; display: block; top: 1650px; left: 0px; width: 100%; height: 200px; background-color: rgba(10, 10, 10, 0.7);">
+                <table style = "position: absolute; width: 95%; height: 100%; left: 2.5%;">
+                    <tr>
+                        <td style = "width: 30%;">
+                            <img src = "./src/logolight.png" alt = "Chromatic Aberration Logo" width = "80%"/>
+                        </td>
+                        <td style = "width: 55%;">
+                            <table style = "width: 100%; height: 100%;">
+                                <tr style = "height: 15%;">
+                                    <td style = "text-align: center;">
+                                        <a  style = "text-decoration: none;" href = "#"><p style = "font-family: Arial; font-size: 15px; color: #f80000;">About Us</p></a>
+                                    </td>
+                                    <td style = "text-align: center;">
+                                        <a style = "text-decoration: none;" href = "#"><p style = "font-family: Arial; font-size: 15px; color: #00f8f8;">Contact Us</p></a>
+                                    </td>
+                                </tr>
+                                <tr style = "height: 15%;">
+                                    <td style = "text-align: center;">
+                                        <a style = "text-decoration: none;" href = "#"><p style = "font-family: Arial; font-size: 15px; color: #f80000;">Code of Ethics</p></a>
+                                    </td>
+                                    <td style = "text-align: center;">
+                                        <a style = "text-decoration: none;" href = "#"><p style = "font-family: Arial; font-size: 15px; color: #00f8f8;">Terms of Use</p></a>
+                                    </td>
+                                </tr>
+                                <tr style = "height: 15%;">
+                                    <td style = "text-align: center;">
+                                        <a style = "text-decoration: none;" href = "#"><p style = "font-family: Arial; font-size: 15px; color: #f80000;">Resources</p></a>
+                                    </td>
+                                    <td style = "text-align: center;">
+                                        <a style = "text-decoration: none;" href = "#"><p style = "font-family: Arial; font-size: 15px; color: #00f8f8;">Privacy Policy</p></a>
+                                    </td>
+                                </tr>
+                                <tr style = "height: 15%;">
+                                    <td style = "text-align: center;">
+                                        <a style = "text-decoration: none;" href = "#"><p style = "font-family: Arial; font-size: 15px; color: #f80000;">Community</p></a>
+                                    </td>
+                                    <td style = "text-align: center;">
+                                        <a style = "text-decoration: none;" href = "#"><p style = "font-family: Arial; font-size: 15px; color: #00f8f8;">Learn More</p></a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td style = "width: 15%;">
+                            <table style = "width: 100%; height: 100%;">
+                                <tr style = "height: 33%;">
+                                    <td>
+                                        <a target = "_blank" style = "text-decoration: none;" href = "https://www.youtube.com/@aberracioncromatica771"><img src = "./src/youtube.png" height = "50px"/></a>
+                                    </td>
+                                    <td style = "text-align: center;">
+                                        <a target = "_blank" style = "text-decoration: none;" href = "https://www.youtube.com/@aberracioncromatica771"><p style = "font-family: Arial; font-size: 20px; color: #f0f0f0;">Youtube</p></a>
+                                    </td>
+                                </tr>
+                                <tr style = "height: 33%;">
+                                    <td>
+                                        <a target = "_blank" style = "text-decoration: none;" href = "https://www.instagram.com/selfspectrum/"><img src = "./src/insta.png" height = "50px"/></a>
+                                    </td>
+                                    <td style = "text-align: center;">
+                                        <a target = "_blank" style = "text-decoration: none;" href = "https://www.instagram.com/selfspectrum/"><p style = "font-family: Arial; font-size: 20px; color: #f0f0f0;">Instagram</p></a>
+                                    </td>
+                                </tr>
+                                <tr style = "height: 33%;">
+                                    <td>
+                                        <a target = "_blank" style = "text-decoration: none;" href = "https://www.tumblr.com/selfspectrum"><img src = "./src/tumblr.png" height = "50px"/></a>
+                                    </td>
+                                    <td style = "text-align: center;">
+                                        <a target = "_blank" style = "text-decoration: none;" href = "https://www.tumblr.com/selfspectrum"><p style = "font-family: Arial; font-size: 20px; color: #f0f0f0;">Tumblr</p></a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div style = "position: absolute; display: block; top: 1850px; left: 0px; width: 100%; height: 60px; background-color: rgba(10, 10, 10, 0.7); text-align: center;">
+                <p style = "font-family: Arial; font-size: 20px; color: #f0f0f0;"><i>©2023 Andres Alfaro A</i></p>
+            </div>
+        </footer>
+	</body>
+</html>

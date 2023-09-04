@@ -1,9 +1,7 @@
 from enum import Enum
-from datetime import date
-from tkinter import Event
+from datetime import date, datetime
 from tkinter.messagebox import showerror, showinfo, showwarning, askquestion
 from db import DB
-from des2.db import DB
 class WindowUIState(Enum):
     Medic = 0
     TENS = 1
@@ -134,7 +132,9 @@ class Person():
         return db
     def UpdateQuery(self, db : DB, rut : int) -> DB:
         return db
-    def DeleteQuery(self, db : DB, rut : int) -> DB:
+    def DeleteQuery(self, db : DB, state : WindowUIState) -> DB:
+        return db
+    def PaymentQuery(self, db : DB) -> DB:
         return db
 class Worker(Person):
     def __init__(self, rut : RUT, name: str = '', admission: date = date(year=2023, month=7, day=3), prevision: Prevision = Prevision.FONASA, afp: AFP = AFP.Uno, salary : int = 0) -> None:
@@ -166,6 +166,11 @@ class Worker(Person):
     @property
     def payment(self) -> int:
         return self.salary - self.afpDiscount - self.healthDiscount + self.bonus
+    def DeleteQuery(self, db : DB, state : WindowUIState) -> DB:
+        db.DeleteTable(table = 'remunerations', where = f'fkRUT = {self.rut}')
+        return db.DeleteTable(table = 'workers', where = f'occupation = {state.value} AND rut = {self.rut}')
+    def PaymentQuery(self, db: DB) -> DB:
+        return db.InsertTable(table = 'remunerations', column = 'fkRUT brute afp prevision plus liquid', values = [self.rut.rut, self.salary, self.afpDiscount, self.healthDiscount, self.bonus, self.payment])
 class Medic(Worker):
     def __init__(self, rut : RUT, name: str = '', admission: date = date(year=2023, month=7, day=3), prevision: Prevision = Prevision.FONASA, afp: AFP = AFP.Uno, salary: int = 0, specialty : Specialty = Specialty.General) -> None:
         super().__init__(rut, name, admission, prevision, afp, salary)
@@ -197,13 +202,34 @@ class Administrative(Worker):
     def UpdateQuery(self, db: DB, rut : int) -> DB:
         return db.UpdateSet(table = 'person', column = 'rut name admission prevision afp salary unit', values = [self.rut.rut, self.name, self.admission.__str__(), self.prevision.value, self.afp.value, self.salary, self.unit.value], where = f'rut = {rut}')
 class Patient(Person):
-    def __init__(self, rut : RUT, name: str = '', admission : date = date(year=2023, month=7, day=3), prevision: Prevision = Prevision.FONASA, afp: AFP = AFP.Uno, reason : str = '', derivation : Derivation = Derivation.Consult) -> None:
+    def __init__(self, rut : RUT, name: str = '', admission : date = date(year=2023, month=7, day=3), prevision: Prevision = Prevision.FONASA, afp: AFP = AFP.Uno, medic : int = 0, reason : str = '', derivation : Derivation = Derivation.Consult, box : int = 1, hDays : int = 0) -> None:
         super().__init__(rut, name, admission, prevision, afp)
+        self.medic = medic
         self.reason = reason
         self.derivation = derivation
-        self.medic : Medic = None
+        self.box = box
+        self.hDays = hDays
+    @property
+    def pay(self) -> int:
+        return 20000 if self.derivation else 35000
+    @property
+    def bonus(self) -> int:
+        return 25000 * self.hDays
+    @property
+    def healthDiscount(self) -> int:
+        discount = 0
+        if Prevision.FONASA: discount = .25
+        elif Prevision.FONASA: discount = .20
+        return round((self.pay + self.bonus) * discount) 
     def InsertQuery(self, db: DB) -> DB:
-        return db.InsertTable(table = 'patients', column = 'rut name admission prevision afp reason derivation box occupation', values = [self.rut.rut, self.name, self.admission.__str__(), self.prevision.value, self.afp.value, self.reason, self.derivation.value, self.box, 3])
+        return db.InsertTable(table = 'patients', column = 'rut name admission prevision afp fkRUT reason derivation box', values = [self.rut.rut, self.name, self.admission.__str__(), self.prevision.value, self.afp.value, self.medic, self.reason, self.derivation.value, self.box])
+    def UpdateQuery(self, db: DB, rut : int) -> DB:
+        return db.UpdateSet(table = 'person', column = 'rut name admission prevision afp fkRUT reason derivation box', values = [self.rut.rut, self.name, self.admission.__str__(), self.prevision.value, self.afp.value, self.medic, self.reason, self.derivation.value, self.box], where = f'rut = {rut}')
+    def DeleteQuery(self, db : DB, state : WindowUIState) -> DB:
+        #db.DeleteTable(table = 'charges', where = f'fkRUT = {self.rut}')
+        return db.DeleteTable(table = 'patients', where = f'rut = {self.rut}')
+    def PaymentQuery(self, db: DB) -> DB:
+        return db.InsertTable(table = 'charges', column = 'rut brute discount extra total', values = [self.rut.rut, self.pay, self.healthDiscount, self.bonus, self.payment])
 class Hospital(DB):
     def __init__(self, name : str = 'hospital Regional Copiapo San Jose del Carmen', boxAmount : int = 5, host : str = 'localhost', user : str = 'root', password : str = '', database : str = '') -> None:
         super().__init__(host, user, password, database)
@@ -215,91 +241,44 @@ class Hospital(DB):
         except Exception as e:
             showerror('Error', message = e)
             return []
-    def SelectUpdateMedicTable(self, event : Event, items : dict, vars : dict):
-        try:
-            item = items['medicTable'].identify('item', event.x, event.y)
-            rut = int(items['medicTable'].item(item, 'values')[0])
-            data = self.Select(table = 'workers', fetch = 1, where = f'occupation = 1 AND rut = {rut}')
-            vars['search'].set(RUT(data[0]).__str__())
-            vars['rut'].set(RUT(data[0]).__str__())
-            vars['name'].set(data[1])
-            vars['year'].set(data[2].year)
-            vars['month'].set(data[2].month)
-            vars['day'].set(data[2].day)
-            items['previsionCombobox'].set(data[3])
-            items['afpCombobox'].set(data[4])
-            vars['salary'].set(data[5])
-            items['specialtyCombobox'].set(data[6])
-            items['areaCombobox'].set(data[7])
-        except Exception as e: showerror('Error', message = e)
-    def SelectUpdateAdminTable(self, event : Event, items : dict, vars : dict):
-        try:
-            item = items['adminTable'].identify('item', event.x, event.y)
-            rut = int(items['adminTable'].item(item, 'values')[0])
-            data = self.Select(table = 'workers', fetch = 1, where = f'occupation = 2 AND rut = {rut}')
-            vars['search'].set(RUT(data[0]).__str__())
-            vars['rut'].set(RUT(data[0]).__str__())
-            vars['name'].set(data[1])
-            vars['year'].set(data[2].year)
-            vars['month'].set(data[2].month)
-            vars['day'].set(data[2].day)
-            items['previsionCombobox'].set(data[3])
-            items['afpCombobox'].set(data[4])
-            vars['salary'].set(data[5])
-            items['unitCombobox'].set(data[8])
-        except Exception as e: showerror('Error', message = e)
-    def SelectUpdatePatientTable(self, event : Event, items : dict, vars : dict):
-        try:
-            item = items['patientTable'].identify('item', event.x, event.y)
-            rut = int(items['patientTable'].item(item, 'values')[0])
-            data = self.Select(table = 'patients', fetch = 1, where = f'occupation = 3 AND rut = {rut}')
-            vars['search'].set(RUT(data[0]).__str__())
-            vars['rut'].set(RUT(data[0]).__str__())
-            vars['name'].set(data[1])
-            vars['year'].set(data[2].year)
-            vars['month'].set(data[2].month)
-            vars['day'].set(data[2].day)
-            items['previsionCombobox'].set(data[3])
-            items['afpCombobox'].set(data[4])
-            vars['reason'].set(data[9])
-            items['derivationCombobox'].set(data[10])
-        except Exception as e: showerror('Error', message = e)
     def InsertPersonTable(self, state : WindowUIState, ClearItems, items : dict, vars : dict):
         try:
             if RUT.ValidateRut(str(vars['rut'].get())):
-                person = Person()
-                if state == WindowUIState.Medic: person = Medic(name = vars['name'].get(), rut = RUT(int(''.join(str(vars['rut'].get()).split('-')[0].split('.')))), admission = date(vars['year'].get(), vars['month'].get(), vars['day'].get()), afp = AFP.Validate(items['afpCombobox'].get()), area = Area.Validate(items['areaCombobox'].get()), prevision = Prevision.Validate(items['previsionCombobox'].get()), salary = vars['salary'].get(), specialty = Specialty.Validate(items['specialtyCombobox'].get()))
-                elif state == WindowUIState.TENS: person = TENS(name = vars['name'].get(), rut = RUT(int(''.join(str(vars['rut'].get()).split('-')[0].split('.')))), admission = date(vars['year'].get(), vars['month'].get(), vars['day'].get()), afp = AFP.Validate(items['afpCombobox'].get()), area = Area.Validate(items['areaCombobox'].get()), prevision = Prevision.Validate(items['previsionCombobox'].get()), salary = vars['salary'].get(), specialty = Specialty.Validate(items['specialtyCombobox'].get()), area = Area.Validate(items['areaCombobox'].get()))
-                elif state == WindowUIState.Admin: person = Administrative(name = vars['name'].get(), rut = RUT(int(''.join(str(vars['rut'].get()).split('-')[0].split('.')))), admission = date(vars['year'].get(), vars['month'].get(), vars['day'].get()), afp = AFP.Validate(items['afpCombobox'].get()), area = Area.Validate(items['areaCombobox'].get()), prevision = Prevision.Validate(items['previsionCombobox'].get()), salary = vars['salary'].get(), unit = Unit.Validate(items['unitCombobox'].get()))
-                elif state == WindowUIState.Patient: person = Patient(name = vars['name'].get(), rut = RUT(int(''.join(str(vars['rut'].get()).split('-')[0].split('.')))), admission = date(vars['year'].get(), vars['month'].get(), vars['day'].get()), afp = AFP.Validate(items['afpCombobox'].get()), area = Area.Validate(items['areaCombobox'].get()), prevision = Prevision.Validate(items['previsionCombobox'].get()), reason = vars['reason'].get(), derivation = Derivation.Validate(items['derivationCombobox'].get()))
+                person = Person(RUT(20751584))
+                if state == WindowUIState.Medic: person = Medic(name = vars['name'].get(), rut = RUT(int(''.join(str(vars['rut'].get()).split('-')[0].split('.')))), admission = date(vars['year'].get(), vars['month'].get(), vars['day'].get()), afp = AFP.Validate(items['afpCombobox'].get()), prevision = Prevision.Validate(items['previsionCombobox'].get()), salary = vars['salary'].get(), specialty = Specialty.Validate(items['specialtyCombobox'].get()))
+                elif state == WindowUIState.TENS: person = TENS(name = vars['name'].get(), rut = RUT(int(''.join(str(vars['rut'].get()).split('-')[0].split('.')))), admission = date(vars['year'].get(), vars['month'].get(), vars['day'].get()), afp = AFP.Validate(items['afpCombobox'].get()), prevision = Prevision.Validate(items['previsionCombobox'].get()), salary = vars['salary'].get(), specialty = Specialty.Validate(items['specialtyCombobox'].get()), area = Area.Validate(items['areaCombobox'].get()))
+                elif state == WindowUIState.Admin: person = Administrative(name = vars['name'].get(), rut = RUT(int(''.join(str(vars['rut'].get()).split('-')[0].split('.')))), admission = date(vars['year'].get(), vars['month'].get(), vars['day'].get()), afp = AFP.Validate(items['afpCombobox'].get()), prevision = Prevision.Validate(items['previsionCombobox'].get()), salary = vars['salary'].get(), unit = Unit.Validate(items['unitCombobox'].get()))
+                elif state == WindowUIState.Patient:
+                    medicRut = self.Select(table = 'workers', column = 'rut', where = f"name LIKE \"{items['medicCombobox'].get()}\"")[0]
+                    person = Patient(name = vars['name'].get(), rut = RUT(int(''.join(str(vars['rut'].get()).split('-')[0].split('.')))), admission = date(vars['year'].get(), vars['month'].get(), vars['day'].get()), afp = AFP.Validate(items['afpCombobox'].get()), prevision = Prevision.Validate(items['previsionCombobox'].get()), medic = medicRut, reason = vars['reason'].get(), derivation = Derivation.Validate(items['derivationCombobox'].get()), box = items['boxCombobox'].get() if Derivation.Validate(items['derivationCombobox'].get()) == Derivation.Emergency else 0, hDays = vars['hDays'].get())
                 person.InsertQuery(self)
                 ClearItems()
         except Exception as e: showerror('Error', message = e)
     def UpdatePersonTable(self, state : WindowUIState, ClearItems, items : dict, vars : dict):
         try:
             if RUT.ValidateRut(str(vars['search'].get())):
-                medic : Medic = None
                 rut = int(''.join(str(vars['search'].get()).split('-')[0].split('.')))
-                for i in self.hospital.workers:
-                    if i.rut.rut == rut:
-                        medic = i
-                        rut = i.rut.rut
-                        break
-                if not medic is None:
-                    person = Person()
-                    if state == WindowUIState.Medic: person = Medic(name = vars['name'].get(), rut = RUT(int(''.join(str(vars['rut'].get()).split('-')[0].split('.')))), admission = date(vars['year'].get(), vars['month'].get(), vars['day'].get()), afp = AFP.Validate(items['afpCombobox'].get()), area = Area.Validate(items['areaCombobox'].get()), prevision = Prevision.Validate(items['previsionCombobox'].get()), salary = vars['salary'].get(), specialty = Specialty.Validate(items['specialtyCombobox'].get()))
-                    elif state == WindowUIState.TENS: person = TENS(name = vars['name'].get(), rut = RUT(int(''.join(str(vars['rut'].get()).split('-')[0].split('.')))), admission = date(vars['year'].get(), vars['month'].get(), vars['day'].get()), afp = AFP.Validate(items['afpCombobox'].get()), area = Area.Validate(items['areaCombobox'].get()), prevision = Prevision.Validate(items['previsionCombobox'].get()), salary = vars['salary'].get(), specialty = Specialty.Validate(items['specialtyCombobox'].get()), area = Area.Validate(items['areaCombobox'].get()))
-                    elif state == WindowUIState.Admin: person = Administrative(name = vars['name'].get(), rut = RUT(int(''.join(str(vars['rut'].get()).split('-')[0].split('.')))), admission = date(vars['year'].get(), vars['month'].get(), vars['day'].get()), afp = AFP.Validate(items['afpCombobox'].get()), area = Area.Validate(items['areaCombobox'].get()), prevision = Prevision.Validate(items['previsionCombobox'].get()), salary = vars['salary'].get(), unit = Unit.Validate(items['unitCombobox'].get()))
-                    elif state == WindowUIState.Patient: person = Patient(name = vars['name'].get(), rut = RUT(int(''.join(str(vars['rut'].get()).split('-')[0].split('.')))), admission = date(vars['year'].get(), vars['month'].get(), vars['day'].get()), afp = AFP.Validate(items['afpCombobox'].get()), area = Area.Validate(items['areaCombobox'].get()), prevision = Prevision.Validate(items['previsionCombobox'].get()), reason = vars['reason'].get(), derivation = Derivation.Validate(items['derivationCombobox'].get()))
-                    person.InsertQuery(self)
+                result = self.Select(table = ('patients' if state == WindowUIState.Patient else 'workers'), column = 'name', fetch = 1, where = f'rut = {rut}')
+                if not result is None:
+                    person = Person(RUT(20751584))
+                    if state == WindowUIState.Medic: person = Medic(name = vars['name'].get(), rut = RUT(int(''.join(str(vars['rut'].get()).split('-')[0].split('.')))), admission = date(vars['year'].get(), vars['month'].get(), vars['day'].get()), afp = AFP.Validate(items['afpCombobox'].get()), prevision = Prevision.Validate(items['previsionCombobox'].get()), salary = vars['salary'].get(), specialty = Specialty.Validate(items['specialtyCombobox'].get()))
+                    elif state == WindowUIState.TENS: person = TENS(name = vars['name'].get(), rut = RUT(int(''.join(str(vars['rut'].get()).split('-')[0].split('.')))), admission = date(vars['year'].get(), vars['month'].get(), vars['day'].get()), afp = AFP.Validate(items['afpCombobox'].get()), prevision = Prevision.Validate(items['previsionCombobox'].get()), salary = vars['salary'].get(), specialty = Specialty.Validate(items['specialtyCombobox'].get()), area = Area.Validate(items['areaCombobox'].get()))
+                    elif state == WindowUIState.Admin: person = Administrative(name = vars['name'].get(), rut = RUT(int(''.join(str(vars['rut'].get()).split('-')[0].split('.')))), admission = date(vars['year'].get(), vars['month'].get(), vars['day'].get()), afp = AFP.Validate(items['afpCombobox'].get()), prevision = Prevision.Validate(items['previsionCombobox'].get()), salary = vars['salary'].get(), unit = Unit.Validate(items['unitCombobox'].get()))
+                    elif state == WindowUIState.Patient: person = Patient(name = vars['name'].get(), rut = RUT(int(''.join(str(vars['rut'].get()).split('-')[0].split('.')))), admission = date(vars['year'].get(), vars['month'].get(), vars['day'].get()), afp = AFP.Validate(items['afpCombobox'].get()), prevision = Prevision.Validate(items['previsionCombobox'].get()), reason = vars['reason'].get(), derivation = Derivation.Validate(items['derivationCombobox'].get()), hDays = vars['hDays'].get())
+                    person.UpdateQuery(self, rut)
                     ClearItems()
         except Exception as e: showerror('Error', message = e)
-    def DeletePersonTable(self, table : str, state : WindowUIState, ClearItems, items : dict, vars : dict):
+    def DeletePersonTable(self, state : WindowUIState, ClearItems, items : dict, vars : dict):
         try:
             if RUT.ValidateRut(str(vars['search'].get())):
                 rut = int(''.join(str(vars['search'].get()).split('-')[0].split('.')))
-                if state != WindowUIState.Patient: self.DeleteTable(table = 'remunerations', where = f'fkPerson = {rut}')
-                self.DeleteTable(table = table, where = f'occupation = {state.value} AND rut = {rut}')
+                data = self.Select(table = ('patients' if state == WindowUIState.Patient else 'workers'), fetch = 1, where = f'rut = {rut}')
+                person = Person(RUT(20751584))
+                if state == WindowUIState.Medic: person = Medic(name = data[1], rut = RUT(data[0]), admission = datetime.strptime(data[2], '%Y-%m-%d %H:%M:%S').date(), afp = AFP.Validate(data[4]), prevision = Prevision.Validate(data[3]), salary = data[5], specialty = Specialty.Validate(data[6]))
+                elif state == WindowUIState.TENS: person = TENS(name = data[1], rut = RUT(data[0]), admission = datetime.strptime(data[2], '%Y-%m-%d %H:%M:%S').date(), afp = AFP.Validate(data[4]), prevision = Prevision.Validate(data[3]), salary = data[5], specialty = Specialty.Validate(data[6]), area = Area.Validate(data[7]))
+                elif state == WindowUIState.Admin: person = Administrative(name = data[1], rut = RUT(data[0]), admission = datetime.strptime(data[2], '%Y-%m-%d %H:%M:%S').date(), afp = AFP.Validate(data[4]), prevision = Prevision.Validate(data[3]), salary = data[5], unit = Unit.Validate(data[8]))
+                elif state == WindowUIState.Patient: person = Patient(name = data[2], rut = RUT(data[1]), admission = datetime.strptime(data[3], '%Y-%m-%d %H:%M:%S').date(), afp = AFP.Validate(data[5]), prevision = Prevision.Validate(data[4]), medic = data[6], reason = data[7], derivation = Derivation.Validate(data[8]), hDays = vars['hDays'].get())
+                person.DeleteQuery(self, state)
                 ClearItems()
         except Exception as e: showerror('Error', message = e)
     def AskIfDelete(self, state : WindowUIState, ClearItems, items : dict, vars : dict):
